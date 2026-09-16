@@ -57,7 +57,6 @@ def ytdlp_info_options():
         "quiet": True,
         "no_warnings": True,
         "js_runtimes": {"node": {}},
-        "impersonate": "chrome",
         "extractor_args": {"youtube": {"player_client": ["web_safari", "web_embedded", "android_vr"]}},
     }
 
@@ -67,7 +66,7 @@ def user_facing_extractor_error(exc):
     lowered = message.lower()
     if "sign in to confirm" in lowered or "not a bot" in lowered or "cookies-from-browser" in lowered:
         return "This platform is asking for verification right now. Please try another supported URL or try again later."
-    return message
+    return message or "The video platform could not provide video information. Please try another supported URL or try again later."
 
 
 def format_size(size):
