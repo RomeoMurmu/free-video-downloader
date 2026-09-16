@@ -41,6 +41,23 @@ def ffmpeg_available():
     return shutil.which("ffmpeg") is not None
 
 
+def ytdlp_info_options():
+    return {
+        "noplaylist": True,
+        "quiet": True,
+        "no_warnings": True,
+        "extractor_args": {"youtube": {"player_client": ["web_safari", "web_embedded", "android_vr"]}},
+    }
+
+
+def user_facing_extractor_error(exc):
+    message = str(exc)
+    lowered = message.lower()
+    if "sign in to confirm" in lowered or "not a bot" in lowered or "cookies-from-browser" in lowered:
+        return "This platform is asking for verification right now. Please try another supported URL or try again later."
+    return message
+
+
 def format_size(size):
     if not size:
         return None
@@ -141,11 +158,10 @@ def download_worker(job_id, url, quality, file_type):
             set_job(job_id, status="processing", progress=100)
 
     options = {
+        **ytdlp_info_options(),
         "outtmpl": output_template,
-        "noplaylist": True,
         "restrictfilenames": True,
         "progress_hooks": [progress_hook],
-        "quiet": True,
     }
     if file_type == "mp3":
         if not ffmpeg_available():
@@ -173,7 +189,7 @@ def download_worker(job_id, url, quality, file_type):
                 filename = max(matches, key=lambda path: path.stat().st_mtime)
         set_job(job_id, status="completed", progress=100, filename=filename.name, expires_at=int(time.time() + TEMP_FILE_MAX_AGE))
     except Exception as exc:
-        set_job(job_id, status="failed", error=str(exc))
+        set_job(job_id, status="failed", error=user_facing_extractor_error(exc))
 
 
 @app.route("/robots.txt")
@@ -208,11 +224,11 @@ def get_video_info():
     if not validate_url(url):
         return jsonify(success=False, error="Please provide a valid http(s) video URL."), 400
     try:
-        with yt_dlp.YoutubeDL({"noplaylist": True, "quiet": True}) as ydl:
+        with yt_dlp.YoutubeDL({**ytdlp_info_options(), "quiet": True}) as ydl:
             info = ydl.extract_info(url, download=False)
         return jsonify(success=True, title=info.get("title", "Downloaded Video"), duration=info.get("duration_string", ""), thumbnail=info.get("thumbnail", ""), formats=build_formats(info), url=url)
     except Exception as exc:
-        return jsonify(success=False, error=str(exc)), 502
+        return jsonify(success=False, error=user_facing_extractor_error(exc)), 502
 
 
 @app.post("/download-format")

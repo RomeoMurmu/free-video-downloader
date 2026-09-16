@@ -104,9 +104,9 @@
                     </span>
                     <input type="url" id="urlInput" required placeholder="Paste video link here (https://...)" 
                         class="w-full bg-slate-950/80 border border-slate-800 rounded-xl py-4 pl-12 pr-32 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all text-sm sm:text-base">
-                    <button type="submit" id="submitBtn" class="absolute right-2 px-5 py-2.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-semibold rounded-lg shadow-lg shadow-rose-600/30 transition-all flex items-center space-x-2 text-sm">
-                        <span id="btnText">Fetch Formats</span>
-                        <i id="btnIcon" class="fa-solid fa-arrow-right"></i>
+                    <button type="submit" id="submitBtn" class="absolute right-1 sm:right-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-semibold rounded-lg shadow-lg shadow-rose-600/30 transition-all flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm whitespace-nowrap">
+                        <span id="btnText">Fetch</span>
+                        <i id="btnIcon" class="fa-solid fa-arrow-right hidden sm:inline-block"></i>
                     </button>
                 </div>
             </form>
@@ -274,7 +274,7 @@
             } finally {
                 loadingState.classList.add('hidden');
                 submitBtn.disabled = false;
-                btnText.textContent = 'Fetch Formats';
+                btnText.textContent = 'Fetch';
                 btnIcon.className = 'fa-solid fa-arrow-right';
             }
         });

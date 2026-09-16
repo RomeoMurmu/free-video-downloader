@@ -10,6 +10,15 @@ def test_robots_and_sitemap_are_available():
     assert sitemap.status_code == 200
     assert "<urlset" in sitemap.text
 
+def test_youtube_options_use_fallback_clients():
+    options = downloader.ytdlp_info_options()
+    assert options["extractor_args"]["youtube"]["player_client"] == ["web_safari", "web_embedded", "android_vr"]
+
+
+def test_bot_error_is_user_friendly():
+    error = downloader.user_facing_extractor_error(Exception("Sign in to confirm you’re not a bot. Use --cookies-from-browser"))
+    assert error == "This platform is asking for verification right now. Please try another supported URL or try again later."
+
 def test_validate_url_accepts_http_and_https():
     assert downloader.validate_url("https://example.com/video")
     assert downloader.validate_url("http://example.com/video")
