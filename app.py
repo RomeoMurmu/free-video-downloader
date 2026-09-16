@@ -56,6 +56,8 @@ def ytdlp_info_options():
         "noplaylist": True,
         "quiet": True,
         "no_warnings": True,
+        "js_runtimes": {"node": {}},
+        "impersonate": "chrome",
         "extractor_args": {"youtube": {"player_client": ["web_safari", "web_embedded", "android_vr"]}},
     }
 
