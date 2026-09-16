@@ -30,6 +30,16 @@ QUALITY_LIMITS = {"4K": 2160, "2K": 1440, "1080p": 1080, "720p": 720, "480p": 48
 URL_SCHEMES = {"http", "https"}
 
 
+def quality_limit(quality):
+    if quality in QUALITY_LIMITS:
+        return QUALITY_LIMITS[quality]
+    match = re.fullmatch(r"([1-9][0-9]{1,3})p", str(quality or ""))
+    if not match:
+        return None
+    height = int(match.group(1))
+    return height if 1 <= height <= 4320 else None
+
+
 def validate_url(value):
     if not isinstance(value, str) or len(value) > 2048:
         return False
@@ -171,7 +181,7 @@ def download_worker(job_id, url, quality, file_type):
             "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3", "preferredquality": "192"}],
         })
     else:
-        limit = QUALITY_LIMITS.get(quality)
+        limit = quality_limit(quality)
         if not limit:
             raise ValueError("Unsupported video quality.")
         options["format"] = f"bestvideo[height<={limit}]+bestaudio/best[height<={limit}]"
@@ -238,7 +248,7 @@ def start_download():
     url = str(data.get("url", "")).strip()
     quality = data.get("quality")
     file_type = data.get("type", "video")
-    if not validate_url(url) or (file_type == "video" and quality not in QUALITY_LIMITS) or (file_type == "mp3" and quality != "MP3 (Audio)"):
+    if not validate_url(url) or (file_type == "video" and quality_limit(quality) is None) or (file_type == "mp3" and quality != "MP3 (Audio)"):
         return jsonify(success=False, error="Invalid download parameters."), 400
     job_id = uuid.uuid4().hex
     with JOBS_LOCK:

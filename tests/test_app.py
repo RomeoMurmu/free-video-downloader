@@ -10,6 +10,12 @@ def test_robots_and_sitemap_are_available():
     assert sitemap.status_code == 200
     assert "<urlset" in sitemap.text
 
+def test_quality_limit_accepts_actual_numeric_resolutions():
+    assert downloader.quality_limit("240p") == 240
+    assert downloader.quality_limit("144p") == 144
+    assert downloader.quality_limit("720p") == 720
+    assert downloader.quality_limit("MP3 (Audio)") is None
+
 def test_youtube_options_use_fallback_clients():
     options = downloader.ytdlp_info_options()
     assert options["extractor_args"]["youtube"]["player_client"] == ["web_safari", "web_embedded", "android_vr"]
