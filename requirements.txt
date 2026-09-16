@@ -1,0 +1,6 @@
+flask>=3.1
+werkzeug>=3.1
+yt-dlp>=2026.8.19
+Flask-Limiter>=3.8
+gunicorn>=23.0
+pytest>=8.0
